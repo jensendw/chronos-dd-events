@@ -1,0 +1,11 @@
+version: '2'
+services:
+  chronos-dd-events:
+    image: jensendw/chronos-dd-events
+    environment:
+      - CHRONOS_URL="http://server1:4400,http://server2:4400,http://server3:4400"
+      - UPDATE_INTERVAL=60
+      - DATADOG_API_KEY=xxxx
+      - DATADOG_APP_KEY=yyyy
+    ports:
+      - "5000:5000"
