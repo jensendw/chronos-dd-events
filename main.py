@@ -22,5 +22,5 @@ def get_health():
 if __name__ == "__main__":
     send_events = Process(target=run_loop, args=())
     send_events.start()
-    app.run(debug=True, use_reloader=False)
+    app.run(debug=True, host='0.0.0.0', use_reloader=False)
     send_events.join()
