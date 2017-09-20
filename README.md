@@ -1,7 +1,7 @@
-# Chronos Datadog Event Pusher
+# Mesos Datadog Event Pusher
 
 ## Overview
-The chronos datadog event pusher service grabs the health status of your chronos tasks and emits the status as an event to datadog.  Your users can then setup alerts and/or subscribe to the status of their services using datadog.
+The mesos datadog event pusher service grabs the health status of tasks in various frameworks and emits the status as an event to datadog.  Your users can then setup alerts and/or subscribe to the status of their services using datadog.
 
 ## Setup
 
@@ -9,6 +9,8 @@ See the docker-compose.yml for what environment variables need to be set, an exp
 
 * CHRONOS_URL
 ** The URL of the chronos servers, this is a comma delimited list of servers
+* MARATHON_URL
+** The URL of the marathon servers, this is a comma delimited list of servers
 * DATADOG_APP_KEY
 ** A datadog APP key
 * DATADOG_API_KEY
@@ -34,6 +36,7 @@ I run this app as a marathon service with a scale of 1.
   },
   "env": {
     "CHRONOS_URL": "chronos1:4400,chronos2:4400",
+    "MARATHON_URL": "chronos1:8080,chronos2:8080",
     "DATADOG_APP_KEY": "xxxx",
     "DATADOG_API_KEY": "yyyyy",
     "UPDATE_INTERVAL": 60
