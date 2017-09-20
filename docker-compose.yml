@@ -4,6 +4,7 @@ services:
     image: jensendw/chronos-dd-events
     environment:
       - CHRONOS_URL="http://server1:4400,http://server2:4400,http://server3:4400"
+      - MARATHON_URL="http://server1:8080,http://server2:8080,http://server3:8080"
       - UPDATE_INTERVAL=60
       - DATADOG_API_KEY=xxxx
       - DATADOG_APP_KEY=yyyy

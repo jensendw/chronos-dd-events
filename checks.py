@@ -1,8 +1,11 @@
 from datadog import initialize, api
 from settings import *
 import chronos
+from marathon import MarathonClient
+import logging
 
-def send_dd_event(title, text, tags, alert_type='info'):
+
+def send_dd_event(title, text, tags, source_type, alert_type='info'):
     """Sends events to datadog"""
 
     options = {
@@ -18,22 +21,42 @@ def send_dd_event(title, text, tags, alert_type='info'):
                      alert_type=alert_type,
                      source_type_name='chronos'),
 
-def get_services_health(chronos_url):
+def get_chronos_services_health(chronos_url):
     """Gets health of all services from chronos"""
     client = chronos.connect(chronos_url)
     for job in client.list():
         if job['errorsSinceLastSuccess'] is not 0:
             send_dd_event("Chronos task: {} failed".format(job['name']),
                           "Chronos Task Id: {}\nLast success: {}\nLast error: {}".format(job['name'], job['lastSuccess'], job['lastError']),
-                          generate_tags(job['name']),
+                          generate_tags('chronos', job['name']),
+                          "chronos",
                           "error"
                          )
         else:
             send_dd_event("Chronos task: {} ran succesfully".format(job['name']),
                           "Chronos Task Id: {}\nLast success: {}\nLast error: {}".format(job['name'], job['lastSuccess'], job['lastError']),
-                          generate_tags(job['name']),
+                          generate_tags('chronos', job['name']),
+                          "chronos",
                          )
 
-def generate_tags(task_name):
+def get_marathon_services_health(marathon_url):
+    """Gets health of all services from marathon"""
+    client = MarathonClient(marathon_url)
+    for app in client.list_apps():
+        if app.tasks_unhealthy > 0:
+            send_dd_event("Marathon service: {} has failed tasks".format(app.id),
+                          "Id: {}\nRunning Tasks: {}\nUnhealthy Tasks: {}".format(app.id, app.tasks_running, app.tasks_unhealthy),
+                          generate_tags('marathon', app.id),
+                          "marathon",
+                          "error"
+                         )
+        else:
+            send_dd_event("Marathon service: {} healthy".format(app.id),
+                          "Id: {}\nRunning Tasks: {}\nUnhealthy Tasks: {}".format(app.id, app.tasks_running, app.tasks_unhealthy),
+                          generate_tags('marathon', app.id),
+                          "marathon",
+                         )
+
+def generate_tags(framework, task_name):
     """Generates tags to send to datadog"""
-    return ['chronos', task_name]
+    return [framework, task_name]
