@@ -24,14 +24,14 @@ I run this app as a marathon service with a scale of 1.
 
 ```json
 {
-  "id": "chronos-dd-events",
+  "id": "mesos-dd-events",
   "cpus": 0.1,
   "mem": 128.0,
   "instances": 1,
   "container": {
     "type": "DOCKER",
     "docker": {
-      "image": "jensendw/chronos-dd-events:latest"
+      "image": "jensendw/mesos-dd-events:latest"
     }
   },
   "env": {
