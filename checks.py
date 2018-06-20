@@ -42,10 +42,16 @@ def get_chronos_services_health(chronos_url):
 def get_marathon_services_health(marathon_url):
     """Gets health of all services from marathon"""
     client = MarathonClient(marathon_url)
-    for app in client.list_apps():
+    for app in client.list_apps(embed_tasks=True):
         if app.tasks_unhealthy > 0:
+            unhealthy_tasks = []
+            for task in app.tasks:
+                if task.state == "TASK_RUNNING" or task.state == "TASK_STAGING":
+                    continue
+                else:
+                    unhealthy_tasks.append(task.id)
             send_dd_event("Marathon service: {} has failed tasks".format(app.id),
-                          "Id: {}\nRunning Tasks: {}\nUnhealthy Tasks: {}".format(app.id, app.tasks_running, app.tasks_unhealthy),
+                          "Id: {}\nRunning Tasks: {}\nUnhealthy Tasks: {}\nUnhealthy Task IDs: {}\n".format(app.id, app.tasks_running, app.tasks_unhealthy, unhealthy_tasks),
                           generate_tags('marathon', app.id),
                           "marathon",
                           "error"
